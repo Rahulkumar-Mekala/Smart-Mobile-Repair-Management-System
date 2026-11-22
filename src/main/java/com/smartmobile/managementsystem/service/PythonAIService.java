@@ -1,3 +1,4 @@
+
 package com.smartmobile.managementsystem.service;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,10 +11,9 @@ public class PythonAIService {
     private final RestClient restClient;
 
     public PythonAIService(
-            RestClient.Builder builder,
             @Value("${python.ai.base-url}") String pythonUrl) {
 
-        this.restClient = builder
+        this.restClient = RestClient.builder()
                 .baseUrl(pythonUrl)
                 .build();
     }
@@ -25,4 +25,3 @@ public class PythonAIService {
                 .body(String.class);
     }
 }
-
