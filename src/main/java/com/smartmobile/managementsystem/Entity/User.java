@@ -1,18 +1,16 @@
+
 package com.smartmobile.managementsystem.Entity;
-
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -28,15 +26,21 @@ public class User {
     @Column(unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    // Null for Google-only accounts
+    @Column(nullable = true)
     private String password;
 
+    // Google account unique ID
+    @Column(unique = true)
+    private String googleId;
+
+    @Column(nullable = false)
     private Boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
-    
+
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,6 +51,4 @@ public class User {
     public void onCreate() {
         createdAt = LocalDateTime.now();
     }
-    
 }
-
