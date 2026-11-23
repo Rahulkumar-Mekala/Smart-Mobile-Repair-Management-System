@@ -5,13 +5,17 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.smartmobile.managementsystem.DTO.LoginRequest;
 import com.smartmobile.managementsystem.DTO.RegisterRequest;
 import com.smartmobile.managementsystem.service.AuthService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -65,6 +69,5 @@ public ResponseEntity<?> login(
                         "message", e.getMessage()
                 ));
     }
-}
-
+ }
 }

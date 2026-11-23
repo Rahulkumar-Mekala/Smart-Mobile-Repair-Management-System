@@ -1,3 +1,4 @@
+
 package com.smartmobile.managementsystem.config;
 
 import java.io.IOException;
@@ -16,13 +17,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	   private final JwtService jwtService;
-	   
-    public JwtAuthenticationFilter(JwtService jwtService) {
-		this.jwtService = jwtService;
-	}
 
-	@Override
+    private final JwtService jwtService;
+
+    public JwtAuthenticationFilter(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -31,20 +33,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null ||
-                !authHeader.startsWith("Bearer ")) {
-
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authHeader.substring(7);
-        try {
 
+        try {
             if (jwtService.validateToken(token)) {
 
-                String email =
-                        jwtService.getEmailFromToken(token);
+                String email = jwtService.getEmailFromToken(token);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -58,17 +57,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 .buildDetails(request)
                 );
 
-                SecurityContextHolder
-                        .getContext()
+                SecurityContextHolder.getContext()
                         .setAuthentication(authentication);
             }
 
         } catch (Exception e) {
-
             SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
-    
 }
