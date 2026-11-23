@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import com.smartmobile.managementsystem.DTO.LoginRequest;
 import com.smartmobile.managementsystem.DTO.RegisterRequest;
 import com.smartmobile.managementsystem.service.AuthService;
 
@@ -45,4 +46,25 @@ public class AuthController {
                     ));
         }
     }
+    
+
+@PostMapping("/login")
+public ResponseEntity<?> login(
+        @Valid @RequestBody LoginRequest request) {
+
+    try {
+        Map<String, Object> response = authService.login(request);
+
+        return ResponseEntity.ok(response);
+
+    } catch (IllegalArgumentException e) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of(
+                        "status", "error",
+                        "message", e.getMessage()
+                ));
+    }
+}
+
 }

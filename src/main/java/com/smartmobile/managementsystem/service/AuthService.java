@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smartmobile.managementsystem.DTO.LoginRequest;
 import com.smartmobile.managementsystem.DTO.RegisterRequest;
 import com.smartmobile.managementsystem.Entity.Role;
 import com.smartmobile.managementsystem.Entity.User;
@@ -86,4 +87,35 @@ public class AuthService {
 
         return response;
     }
+    
+
+public Map<String, Object> login(LoginRequest request) {
+
+    String email = request.getEmail().trim().toLowerCase();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new IllegalArgumentException("Invalid email or password"));
+
+    if (!Boolean.TRUE.equals(user.getActive())) {
+        throw new IllegalArgumentException("Account is inactive");
+    }
+
+    if (!passwordEncoder.matches(
+            request.getPassword(), user.getPassword())) {
+        throw new IllegalArgumentException("Invalid email or password");
+    }
+
+    Map<String, Object> response = new HashMap<>();
+
+    response.put("status", "success");
+    response.put("message", "Login successful");
+    response.put("userId", user.getId());
+    response.put("fullName", user.getFullName());
+    response.put("email", user.getEmail());
+    response.put("role", user.getRole().getRoleName());
+
+    return response;
+}
+
 }
