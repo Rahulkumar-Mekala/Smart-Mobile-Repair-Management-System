@@ -13,12 +13,13 @@ import com.smartmobile.managementsystem.DTO.LoginRequest;
 import com.smartmobile.managementsystem.DTO.RegisterRequest;
 import com.smartmobile.managementsystem.Entity.Role;
 import com.smartmobile.managementsystem.Entity.User;
+import com.smartmobile.managementsystem.config.JwtService;
 import com.smartmobile.managementsystem.repository.RoleRepository;
 import com.smartmobile.managementsystem.repository.UserRepository;
 
 @Service
 public class AuthService {
-
+	private final JwtService jwtService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -26,11 +27,13 @@ public class AuthService {
     public AuthService(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService=jwtService;
     }
 
     @Transactional
@@ -69,10 +72,10 @@ public class AuthService {
 
         // Encrypt password
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+       
         user.setActive(true);
         user.setRole(role);
-
+     
         User savedUser = userRepository.save(user);
 
         // Registration response
@@ -84,8 +87,7 @@ public class AuthService {
         response.put("fullName", savedUser.getFullName());
         response.put("email", savedUser.getEmail());
         response.put("role", savedUser.getRole().getRoleName());
-
-        return response;
+            return response;
     }
     
 
@@ -114,6 +116,10 @@ public Map<String, Object> login(LoginRequest request) {
     response.put("fullName", user.getFullName());
     response.put("email", user.getEmail());
     response.put("role", user.getRole().getRoleName());
+    String token = jwtService.generateToken(user.getEmail());
+
+    response.put("token", token);
+    response.put("tokenType", "Bearer");
 
     return response;
 }
