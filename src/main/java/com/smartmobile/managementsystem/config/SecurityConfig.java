@@ -24,35 +24,36 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/register",
-                    "/api/auth/login",
-                    "/api/auth/verify-otp",
-                    "/api/ai/test"
-                ).permitAll()
-                .requestMatchers(
-                    org.springframework.http.HttpMethod.OPTIONS,
-                    "/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(
-                jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class
-            )
-            .httpBasic(basic -> basic.disable())
-            .formLogin(form -> form.disable());
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http)
+        throws Exception {
 
-        return http.build();
-    }
+    http
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> {})
+        .sessionManagement(session ->
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/",
+                "/error",
+                "/api/auth/**",
+                "/api/ai/test"
+            ).permitAll()
+            .requestMatchers(
+                org.springframework.http.HttpMethod.OPTIONS, "/**"
+            ).permitAll()
+            .anyRequest().authenticated()
+        )
+        .addFilterBefore(
+            jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class
+        )
+        .httpBasic(basic -> basic.disable())
+        .formLogin(form -> form.disable());
+
+    return http.build();
+ }
+
 }
