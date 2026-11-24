@@ -1,6 +1,7 @@
 package com.smartmobile.managementsystem.controller;
 
 
+import com.smartmobile.managementsystem.service.OtpService;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartmobile.managementsystem.DTO.LoginRequest;
+import com.smartmobile.managementsystem.DTO.OtpVerificationRequest;
 import com.smartmobile.managementsystem.DTO.RegisterRequest;
 import com.smartmobile.managementsystem.service.AuthService;
 
@@ -22,15 +24,16 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final AuthService authService;
+    private final OtpService otpService;
+	private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, OtpService otpService) {
         this.authService = authService;
+		this.otpService = otpService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
         try {
             Map<String, Object> response =
@@ -51,6 +54,14 @@ public class AuthController {
         }
     }
     
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Map<String, Object>> verifyOtp(
+            @Valid @RequestBody OtpVerificationRequest request) {
+
+        return ResponseEntity.ok(
+                otpService.verifyOtp(request)
+        );
+    }
 
 @PostMapping("/login")
 public ResponseEntity<?> login(

@@ -41,53 +41,31 @@ public class AuthService {
 
         String email = request.getEmail().trim().toLowerCase();
 
-        // Check duplicate email
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException(
-                    "Email is already registered");
+            throw new IllegalArgumentException("Email is already registered");
         }
 
-        // Check duplicate phone number
         String phone = request.getPhoneNumber();
 
         if (phone != null && !phone.isBlank()
                 && userRepository.existsByPhoneNumber(phone.trim())) {
-
-            throw new IllegalArgumentException(
-                    "Phone number is already registered");
+            throw new IllegalArgumentException("Phone number is already registered");
         }
 
-        // Get SHOP_OWNER role
-        Role role = roleRepository.findByRoleName("SHOP_OWNER")
-                .orElseThrow(() ->
-                        new IllegalStateException("SHOP_OWNER role not found"));
+   
+        String otp = String.valueOf(
+                100000 + new java.security.SecureRandom().nextInt(900000)
+        );
 
-        // Create user
-        User user = new User();
+        // TODO: Save pending registration and OTP
+        // TODO: Send OTP to email
 
-        user.setFullName(request.getFullName().trim());
-        user.setEmail(email);
-        user.setPhoneNumber(
-                phone == null || phone.isBlank() ? null : phone.trim());
-
-        // Encrypt password
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-       
-        user.setActive(true);
-        user.setRole(role);
-     
-        User savedUser = userRepository.save(user);
-
-        // Registration response
         Map<String, Object> response = new HashMap<>();
-
         response.put("status", "success");
-        response.put("message", "Registration successful");
-        response.put("userId", savedUser.getId());
-        response.put("fullName", savedUser.getFullName());
-        response.put("email", savedUser.getEmail());
-        response.put("role", savedUser.getRole().getRoleName());
-            return response;
+        response.put("message", "OTP sent to your email");
+        response.put("email", email);
+
+        return response;
     }
     
 
