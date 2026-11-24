@@ -1,4 +1,6 @@
+
 package com.smartmobile.managementsystem.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 
 @Configuration
 public class SecurityConfig {
@@ -29,16 +30,19 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                		 "/api/auth/register",
-                		    "/api/auth/login",
-                		    "/api/auth/verify-otp",
-                		    "/api/ai/test",
-                		    
-                    "/api/user/profile"
+                    "/api/auth/register",
+                    "/api/auth/login",
+                    "/api/auth/verify-otp",
+                    "/api/ai/test"
+                ).permitAll()
+                .requestMatchers(
+                    org.springframework.http.HttpMethod.OPTIONS,
+                    "/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
@@ -52,4 +56,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
