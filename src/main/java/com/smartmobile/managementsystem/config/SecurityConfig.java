@@ -36,6 +36,7 @@ public class SecurityConfig {
                     "/api/auth/register",
                     "/api/auth/login",
                     "/api/ai/test",
+                    "/api/auth/verify-otp",
                     "/api/user/profile"
                 ).permitAll()
                 .anyRequest().authenticated()
