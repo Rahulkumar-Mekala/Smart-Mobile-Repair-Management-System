@@ -41,11 +41,7 @@ public class OtpService {
     }
 
     @Transactional
-    public void generateAndSendOtp(
-            String email,
-            String fullName,
-            String phone,
-            String password) throws Exception {
+    public void generateAndSendOtp( String email, String fullName, String phone, String password) throws Exception {
 
         String otp = String.format("%06d",
                 new java.security.SecureRandom().nextInt(1000000));
@@ -66,8 +62,7 @@ public class OtpService {
     }
 
     @Transactional
-    public Map<String, Object> verifyOtp(
-            OtpVerificationRequest request) {
+    public Map<String, Object> verifyOtp(OtpVerificationRequest request) {
 
         String email = request.getEmail().trim().toLowerCase();
 

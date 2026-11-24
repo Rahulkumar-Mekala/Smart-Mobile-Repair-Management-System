@@ -36,19 +36,14 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
         try {
-            Map<String, Object> response =
-                    authService.register(request);
+            Map<String, Object> response = authService.register(request);
 
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(response);
+            return ResponseEntity .status(HttpStatus.CREATED) .body(response);
 
         } catch (IllegalArgumentException e) {
 
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of(
-                            "status", "error",
+            return ResponseEntity.badRequest()
+            		.body(Map.of( "status", "error",
                             "message", e.getMessage()
                     ));
         }
