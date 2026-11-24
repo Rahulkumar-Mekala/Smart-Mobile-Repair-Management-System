@@ -41,24 +41,38 @@ public class OtpService {
     }
 
     @Transactional
-    public void generateAndSendOtp( String email, String fullName, String phone, String password) throws Exception {
+    public void generateAndSendOtp(
+            String email,
+            String fullName,
+            String phone,
+            String password) throws Exception {
 
-        String otp = String.format("%06d",
-                new java.security.SecureRandom().nextInt(1000000));
+        try {
+            String otp = String.format("%06d",
+                    new java.security.SecureRandom().nextInt(1000000));
 
-        EmailOtp emailOtp = new EmailOtp();
+            EmailOtp emailOtp = new EmailOtp();
+            emailOtp.setEmail(email);
+            emailOtp.setFullName(fullName);
+            emailOtp.setPhoneNumber(phone);
+            emailOtp.setPassword(passwordEncoder.encode(password));
+            emailOtp.setOtp(otp);
+            emailOtp.setExpiryTime(LocalDateTime.now().plusMinutes(5));
 
-        emailOtp.setEmail(email);
-        emailOtp.setFullName(fullName);
-        emailOtp.setPhoneNumber(phone);
-        emailOtp.setPassword(passwordEncoder.encode(password));
-        emailOtp.setOtp(otp);
-        emailOtp.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+            otpRepository.deleteByEmail(email);
+            otpRepository.saveAndFlush(emailOtp);
 
-        otpRepository.deleteByEmail(email);
-        otpRepository.save(emailOtp);
+            System.out.println("OTP_DATABASE_SAVE_SUCCESS");
 
-        emailService.sendOtp(email, otp);
+            emailService.sendOtp(email, otp);
+
+            System.out.println("OTP_EMAIL_SENT_SUCCESS");
+
+        } catch (Exception e) {
+            System.err.println("OTP_PROCESS_FAILED");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional
