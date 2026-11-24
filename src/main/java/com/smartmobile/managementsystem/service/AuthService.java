@@ -23,42 +23,48 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OtpService otpService;
 
-    public AuthService(
-            UserRepository userRepository,
-            RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService) {
+  
+  
+    public AuthService(JwtService jwtService, UserRepository userRepository, RoleRepository roleRepository,
+			PasswordEncoder passwordEncoder, OtpService otpService) {
+		
+		this.jwtService = jwtService;
+		this.userRepository = userRepository;
+		this.roleRepository = roleRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.otpService = otpService;
+	}
 
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService=jwtService;
-    }
 
     @Transactional
     public Map<String, Object> register(RegisterRequest request) {
 
         String email = request.getEmail().trim().toLowerCase();
+        String phone = request.getPhoneNumber();
 
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email is already registered");
+            throw new IllegalArgumentException(
+                    "Email is already registered");
         }
-
-        String phone = request.getPhoneNumber();
 
         if (phone != null && !phone.isBlank()
                 && userRepository.existsByPhoneNumber(phone.trim())) {
-            throw new IllegalArgumentException("Phone number is already registered");
+            throw new IllegalArgumentException(
+                    "Phone number is already registered");
         }
 
-   
-        String otp = String.valueOf(
-                100000 + new java.security.SecureRandom().nextInt(900000)
-        );
-
-        // TODO: Save pending registration and OTP
-        // TODO: Send OTP to email
+        try {
+            otpService.generateAndSendOtp(
+                    email,
+                    request.getFullName().trim(),
+                    phone == null || phone.isBlank() ? null : phone.trim(),
+                    request.getPassword()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send OTP email", e);
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
@@ -67,7 +73,6 @@ public class AuthService {
 
         return response;
     }
-    
 
 public Map<String, Object> login(LoginRequest request) {
 
