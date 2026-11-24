@@ -45,14 +45,12 @@ public class AuthService {
         String phone = request.getPhoneNumber();
 
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException(
-                    "Email is already registered");
+            throw new IllegalArgumentException("Email is already registered");
         }
 
         if (phone != null && !phone.isBlank()
                 && userRepository.existsByPhoneNumber(phone.trim())) {
-            throw new IllegalArgumentException(
-                    "Phone number is already registered");
+            throw new IllegalArgumentException("Phone number is already registered");
         }
 
         try {
@@ -62,8 +60,10 @@ public class AuthService {
                     phone == null || phone.isBlank() ? null : phone.trim(),
                     request.getPassword()
             );
+
         } catch (Exception e) {
-            throw new RuntimeException("Failed to send OTP email", e);
+            e.printStackTrace();
+            throw new RuntimeException("OTP sending failed: " + e.getMessage(), e);
         }
 
         Map<String, Object> response = new HashMap<>();
